@@ -23,16 +23,20 @@ const bookingRouter = require("./routes/booking.js");
 // Use environment variable for MongoDB connection or fallback to local
 const MONGO_URL = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017/wanderease";
 
+// MongoDB connection with better error handling
+main()
+    .then(() => {
+        console.log("✅ Connected to MongoDB successfully");
+    })
+    .catch((err) => {
+        console.error("❌ MongoDB connection error:", err.message);
+        console.error("Connection string (masked):", MONGO_URL.replace(/\/\/.*@/, "//*****@"));
+    });
 
-main().then(()=>{
-    console.log("connected to DB");
-})
-.catch((err)=>{
-    console.log(err);
-});
-
-async function main(){
-    await mongoose.connect(MONGO_URL);
+async function main() {
+    await mongoose.connect(MONGO_URL, {
+        serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+    });
 }
 app.set("view engine","ejs");
 app.set("views", path.join(__dirname, "views"));
