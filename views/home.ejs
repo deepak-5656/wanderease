@@ -1,0 +1,75 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+<div class="row text-center mb-5">
+<div class="col-12">
+<h1 class="display-4 mb-4">Welcome to WanderEase</h1>
+<p class="lead">Discover amazing places to stay around the world</p>
+<a href="/listings" class="btn btn-danger btn-lg mt-3">Explore Listings</a>
+</div>
+</div>
+
+<div class="row">
+<div class="col-md-4 mb-4">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<i class="fas fa-map-marked-alt fa-3x text-primary mb-3"></i>
+<h4>Explore Destinations</h4>
+<p>Find the perfect place for your next adventure</p>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 mb-4">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<i class="fas fa-home fa-3x text-primary mb-3"></i>
+<h4>List Your Property</h4>
+<p>Share your space and earn extra income</p>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 mb-4">
+<div class="card shadow-sm">
+<div class="card-body text-center">
+<i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
+<h4>Easy Booking</h4>
+<p>Book your stay in just a few clicks</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="row mt-5">
+<div class="col-12 text-center">
+<h3 class="mb-4">Featured Listings</h3>
+<% if (allListings && allListings.length > 0) { %>
+<% const featuredListings = allListings.slice(0, 3); %>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+<% for(let listing of featuredListings) { %>
+<div class="col">
+<div class="card h-100 shadow-sm">
+<img src="<%= listing.image.url %>" class="card-img-top" style="height: 200px; object-fit: cover;">
+<div class="card-body">
+<h6 class="card-title"><%= listing.title %></h6>
+<p class="text-muted small"><i class="fas fa-map-marker-alt me-1"></i><%= listing.location %></p>
+<p class="fw-bold text-dark">₹<%= listing.price %> per night</p>
+<a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-dark">View Details</a>
+
+</div>
+</div>
+</div>
+<% } %>
+</div>
+<div class="mt-4">
+<a href="/listings" class="btn btn-danger">View All Listings</a>
+</div>
+<br>
+<% } else { %>
+<p class="text-muted">No listings available yet. <a href="/listings/new">Create the first one!</a></p>
+<% } %>
+</div>
+</div>
+</div>
+

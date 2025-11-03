@@ -1,0 +1,154 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- User Profile Card -->
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    </div>
+                    <h4 class="fw-bold mb-1"><%= currentUser.username %></h4>
+                    <p class="text-muted mb-3"><%= currentUser.email %></p>
+                    <div class="d-grid gap-2">
+                        <a href="/listings/new" class="btn btn-danger">
+                            <i class="fas fa-plus me-1"></i>Add New Listing
+                        </a>
+                        <a href="/logout" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- User's Listings -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">My Listings</h3>
+                <span class="badge bg-primary fs-6"><%= userListings.length %> listings</span>
+            </div>
+            
+            <% if (userListings.length > 0) { %>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <% for(let listing of userListings) { %>
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="position-relative">
+                                    <img src="<%= listing.image.url %>" class="card-img-top" alt="<%= listing.title %>" style="height: 200px; object-fit: cover;">
+                                    <div class="position-absolute top-0 end-0 m-2">
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm rounded-circle" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="/listings/<%= listing._id %>/edit">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+                                                        <button class="dropdown-item text-danger" onclick="return confirm('Are you sure?')">
+                                                            <i class="fas fa-trash me-2"></i>Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold"><%= listing.title %></h6>
+                                    <p class="text-muted small mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i><%= listing.location %>
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-danger">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                                        <small class="text-muted">per night</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="/listings/<%= listing._id %>" class="btn btn-outline-danger w-100">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-5">
+                    <i class="fas fa-home fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No listings yet</h4>
+                    <p class="text-muted">Start by creating your first listing</p>
+                    <a href="/listings/new" class="btn btn-danger">
+                        <i class="fas fa-plus me-1"></i>Create Your First Listing
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- My Bookings -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="fw-bold mb-4">My Bookings</h3>
+            
+            <% if (guestBookings.length > 0) { %>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <% for(let booking of guestBookings) { %>
+                        <div class="col">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="fw-bold"><%= booking.listing.title %></h6>
+                                    <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt me-1"></i><%= booking.listing.location %></p>
+                                    
+                                    <div class="mb-2">
+                                        <small>Check-In:</small> <strong><%= new Date(booking.checkIn).toLocaleDateString() %></strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>Check-Out:</small> <strong><%= new Date(booking.checkOut).toLocaleDateString() %></strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>Guests:</small> <strong><%= booking.guests %></strong>
+                                    </div>
+                                    <div class="mb-3">
+                                        <small>Total:</small> <strong class="text-danger">₹<%= booking.totalPrice.toLocaleString("en-IN") %></strong>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <% if (booking.status === "pending") { %>
+                                            <span class="badge bg-warning">Pending</span>
+                                        <% } else if (booking.status === "confirmed") { %>
+                                            <span class="badge bg-success">Confirmed</span>
+                                        <% } else if (booking.status === "cancelled") { %>
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-primary">View</a>
+                                        <% if (booking.status === "pending" || booking.status === "confirmed") { %>
+                                            <form method="POST" action="/listings/<%= booking.listing._id %>/bookings/<%= booking._id %>?_method=DELETE" class="d-inline">
+                                                <button class="btn btn-sm btn-danger" onclick="return confirm('Cancel booking?')">Cancel</button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-5 bg-light rounded">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No bookings yet</h5>
+                    <a href="/listings" class="btn btn-danger mt-3">Browse Listings</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

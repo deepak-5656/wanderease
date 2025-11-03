@@ -1,0 +1,166 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+<div class="row">
+<div class="col-12 text-center">
+<h1><%= listing.title %></h1>
+</div>
+</div>
+
+<div class="row mt-4">
+<div class="col-6 offset-3">
+<img src="<%= listing.image.url %>" class="img-fluid" style="max-height: 400px; object-fit: cover;">
+</div>
+</div>
+
+<div class="row mt-4">
+<div class="col-12 text-center">
+<p><strong>Price:</strong> ₹<%= listing.price %></p>
+<p><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
+<p><strong>Description:</strong> <%= listing.description %></p>
+
+<% if (currentUser && listing.owner && listing.owner._id.equals(currentUser._id)) { %>
+<div class="mt-3">
+<a href="/listings/<%= listing._id %>/edit" class="btn btn-primary me-2">Edit</a>
+<form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+<button class="btn btn-danger" onclick="return confirm('Delete this?')">Delete</button>
+</form>
+</div>
+<% } %>
+
+<% if (currentUser) { %>
+<% if (!listing.owner || !listing.owner._id || !listing.owner._id.equals(currentUser._id)) { %>
+<div class="mt-3">
+<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#bookingModal">Book Now</button>
+</div>
+
+<div class="modal fade" id="bookingModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Book This Listing</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+<form action="/listings/<%= listing._id %>/bookings" method="POST">
+<div class="mb-3">
+<label>Check-In</label>
+<input type="date" name="booking[checkIn]" class="form-control" required id="checkIn">
+</div>
+<div class="mb-3">
+<label>Check-Out</label>
+<input type="date" name="booking[checkOut]" class="form-control" required id="checkOut">
+</div>
+<div class="mb-3">
+<label>Guests</label>
+<input type="number" name="booking[guests]" class="form-control" min="1" value="1" required>
+</div>
+<p class="small">Price: ₹<%= listing.price %> per night</p>
+<button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+var today = new Date().toISOString().split('T')[0];
+var checkIn = document.getElementById('checkIn');
+var checkOut = document.getElementById('checkOut');
+if (checkIn) checkIn.setAttribute('min', today);
+if (checkOut) checkOut.setAttribute('min', today);
+if (checkIn) {
+checkIn.addEventListener('change', function() {
+if (checkOut) checkOut.setAttribute('min', this.value);
+});
+}
+});
+</script>
+<% } else { %>
+<div class="mt-3">
+<a href="/login" class="btn btn-primary btn-sm">Book Now</a>
+</div>
+<% } %>
+<% } %>
+
+</div>
+</div>
+
+<hr class="my-5">
+    
+<div class="row mt-5">
+<div class="col-6 offset-3">
+<h3 class="text-center">Reviews</h3>
+
+<% if (currentUser) { %>
+<form action="/listings/<%= listing.id %>/reviews" method="POST">
+<div class="mb-3">
+<label>Rating</label>
+<select name="review[rating]" class="form-select">
+<option value="1">1 Star</option>
+<option value="2">2 Stars</option>
+<option value="3">3 Stars</option>
+<option value="4">4 Stars</option>
+<option value="5">5 Stars</option>
+</select>
+</div>
+<div class="mb-3">
+<label>Comment</label>
+<textarea name="review[comment]" class="form-control" rows="3"></textarea>
+</div>
+<button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
+<% } else { %>
+<p>Please <a href="/login">login</a> to leave a review</p>
+<% } %>
+
+<div class="mt-4">
+<% for(review of listing.reviews) { %>
+<div class="card mb-3">
+<div class="card-body">
+<h6><% if (review.author && review.author.username) { %><%= review.author.username %><% } else { %>Anonymous<% } %></h6>
+<p>Rating: <%= review.rating %> stars</p>
+<p><%= review.comment %></p>
+<% if (currentUser && review.author && review.author._id.equals(currentUser._id)) { %>
+<form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="d-inline">
+<button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</button>
+</form>
+<% } %>
+</div>
+</div>
+<% } %>
+</div>
+</div>
+</div>
+
+<div class="row mt-5">
+<div class="col-6 offset-3">
+<h3 class="text-center mb-4">Location Map</h3>
+<div id="map" style="height: 400px; border-radius: 10px;"></div>
+</div>
+</div>
+
+<div class="row mt-5 mb-5">
+<div class="col-12"></div>
+</div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+var lat = 19.0760;
+var lng = 72.8777;
+var map = L.map('map').setView([lat, lng], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '© OpenStreetMap contributors',
+maxZoom: 19
+}).addTo(map);
+var marker = L.marker([lat, lng]).addTo(map);
+marker.bindPopup('<h6><%= listing.title %></h6><p>Price: ₹<%= listing.price %></p><p><%= listing.location %>, <%= listing.country %></p>').openPopup();
+});
+</script>
+
+
+
+
