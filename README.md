@@ -57,9 +57,7 @@ wanderease/
 
 - 🧠 **AI-Powered Travel Recommendations**
   - Suggest destinations based on interests and search patterns.
-
 - 🌍 **Interactive Maps**
   - Integrate Google Maps or Mapbox for location-based browsing.
-
 - 🧳 **User Dashboard**
   - Let users save favorites, manage listings, and view past bookings.
