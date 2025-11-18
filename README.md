@@ -29,7 +29,6 @@ It allows users to explore beautiful travel destinations, view details, and expe
 - ☁️ **Cloud Deployment on Render** – Fully deployed Node.js/Express backend hosted on Render with live MongoDB Atlas connection  
 - 🔒 **Environment Variable Security** – Sensitive credentials managed using `.env` files  
 - 🎨 **Responsive UI (EJS + Bootstrap)** – User-friendly and responsive design for smooth navigation across devices  
-- 🧩 **Scalable Codebase** – Structured to easily add new features like bookings, AI recommendations, or map integrations in the future
 
 ---
 
